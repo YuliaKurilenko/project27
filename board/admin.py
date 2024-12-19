@@ -3,3 +3,4 @@ from .models import Advertisement, Comment
 
 admin.site.register(Advertisement)
 admin.site.register(Comment)
+admin.site.register(Statistic)
