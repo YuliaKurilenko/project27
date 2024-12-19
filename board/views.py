@@ -61,6 +61,34 @@ def add_advertisement(request):
         form = AdvertisementForm()
     return render(request, 'board/add_advertisement.html', {'form': form})
 
+@login_required
+def add_advertisement(request):
+    """
+    Add advertisement view
+    """
+    if request.method == "POST":
+        form = AdvertisementForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            advertisement = form.save(commit=False)
+            advertisement.author = request.user
+            advertisement.save()
+            request.user.save()
+
+            statistic = Statistic.objects.filter(author=request.user)
+            if not statistic:
+                Statistic.objects.create(author=request.user, ad_count=1)
+            else:
+                statistic = Statistic.objects.all().filter(author=request.user)
+                for stat in statistic:
+                    print(stat.ad_count)
+                    stat.ad_count += 1
+                    stat.save()
+
+            return redirect('board:advertisement_list')
+    else:
+        form = AdvertisementForm()
+    return render(request, 'board/add_advertisement.html', {'form': form})
+
 
 @login_required
 def edit_advertisement(request, pk):
